@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    sequel (5.13.0)
+    tiny_tds (2.1.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  sequel
+  tiny_tds (~> 2.1.2)
+
+BUNDLED WITH
+   1.16.5
