@@ -1,10 +1,16 @@
+require 'dotenv'
+require 'faker'
 require 'sequel'   
+
+Dotenv.load
+
+Faker::Config.locale = 'en-GB'
 
 DB = Sequel.connect(adapter: 'tinytds', 
                     host: 'localhost', 
                     database: 'Repository_Live', 
-                    user: 'sa', 
-                    password: 'Uw3kJ4xCsaZcGaDx')
+                    user: ENV['MSSQL_USERNAME'] || 'sa', 
+                    password: ENV['MSSQL_PASSWORD'])
 
 require './ks2_pupil'
 
@@ -15,496 +21,538 @@ class App
   end
 
   def build_pupil
+    academic_year = rand(2015..2017)
+    is_female = Random.new.rand(1.0) > 0.5 
+    ethnicity = %i(wirt wrom woth mwbc mwba mwas moth aind apkn aban aoth bcrb bafr both chne ooth uncla).sample
+    dob = Faker::Date.birthday(7, 11) # pupil between 7 and 11
+    age_start = age_at(dob, Date.new(academic_year,9,1))
+    local_authority_id = (201..938).to_a.sample
+    estab = format('%04d', rand(9999))
+
+    is_cla = Random.new.rand(1.0) > 0.9
+    cla_months = rand(24)
+
+    is_fsm = Random.new.rand(1.0) > 0.9
+
+    is_refugee = Random.new.rand(1.0) > 0.9
+
+    joined_school_years_ago = rand(5)
+
+    nftype = (10..60).to_a.sample
+
     Ks2Pupil.new(
-      acadyr: 2, 
-      candno: 12)
-    
-    # Tier 2
-    # CANDNO
-    # CAND_ID
-    # UPN
-    # SURNAME
-    # FORENAMES
-    # DOB
-    # AGE_START
-    # MONTH_PART
-    # YEAROFBIRTH
-    # MONTHOFBIRTH
-    # IDACI
-    # REFUGEE
-    # ENTRYDAT
-    # CLA_6_MONTHS
-    # CLA_12_MONTHS
-    # CLA_PP
-    # CLA_PP_6_MONTHS
-    # CLA_PP_1_DAY
-    # FSM_CLA
-    # FSM6_CLA
-    # ADOPTEDFROMCARE_ALLYEARS
-    # PLAA
-    # FSM6CLA1A
-    # AGE
-    # FEMALE
-    # FSM
-    # FSM6
-    # FSM6_P
-    # SENPS
-    # SENA
-    # SENF
-    # SENELK
-    # SENELE
-    # SENELSE
-    # SENELAPK
-    # SENTYPE
-    # FLANG
-    # INCAREEV
-    # WIRI
-    # WIRT
-    # WROM
-    # WOTH
-    # MWBC
-    # MWBA
-    # MWAS
-    # MOTH
-    # AIND
-    # APKN
-    # ABAN
-    # AOTH
-    # BCRB
-    # BAFR
-    # BOTH
-    # CHNE
-    # OOTH
-    # UNCLA
-    # FSMWIRI
-    # FSMWIRT
-    # FSMWROM
-    # FSMWOTH
-    # FSMMWBC
-    # FSMMWBA
-    # FSMMWAS
-    # FSMMOTH
-    # FSMAIND
-    # FSMAPKN
-    # FSMABAN
-    # FSMAOTH
-    # FSMBCRB
-    # FSMBAFR
-    # FSMBOTH
-    # FSMCHNE
-    # FSMOOTH
-    # FSMUNCLA
-    # LA
-    # LA_9CODE
-    # ESTAB
-    # LAESTAB
-    # BESTLEAE
-    # BASCLEAE
-    # URN
-    # URN_AC
-    # OPEN_AC
-    # PCODE
-    # PRELEAE
-    # 
-    # YEARGRP
-     
-    # Yellow!
-    # ACTYEARGRP
-    # GENDER
-    # ToE_CODE
-    # NFTYPE
-    # MMSCH
-    # MMSCH2
-    # MSCH
-    # MSCH2
-    # AMEND
-    # AMDPUPIL
-    # VERSION
-    # SOURCECTY
-    # LANGSCH
-    # LANGMATTA
-    # LANGSCITA
-    # ENDKS
-    # ENROLSTS
-    # NENTRIES
-    # EXAMYEAR_EN
-    # EXAMYEAR_RE
-    # EXAMYEAR_GPS
-    # EXAMYEAR_MA
-    # EXAMYEAR_SC
-    # SCHRES
-    # LARES
-    # NATRES
-    # NATMTDRES
-    # NPDDEN_LA
-    # NPDDEN_NAT
-    # SCHRESTA
-    # LARESTA
-    # NATRESTA
-    # NATMTDRESTA
-    # READOUTCOME
-    # MATOUTCOME
-    # GPSOUTCOME
-    # READSCORE
-    # MATSCORE
-    # GPSSCORE
-    # READSPECCON
-    # MATSPECCON
-    # GPSSPECCON
-    # WRITTAOUTCOME
-    # SCITAOUTCOME
-    # MATTAOUTCOME
-    # READTAOUTCOME
-    # ELIGREAD
-    # ELIGREADTA
-    # ELIGWRIT
-    # ELIGWRITTA
-    # ELIGENG
-    # ELIGENGTA
-    # ELIGMAT
-    # ELIGMATTA
-    # ELIGENGLA
-    # ELIGREADLA
-    # ELIGWRITLA
-    # ELIGGPSLA
-    # ELIGWRITTALA
-    # ELIGREADWRITTAMATLA
-    # ELIGMATLA
-    # ELIGRWMLA
-    # ELIGSCI
-    # ELIGSCITA
-    # ELIGREADWRITTAMAT
-    # VALREADWRITTAMAT
-    # ELIGGPS
-    # VALENG
-    # VALENGTA
-    # VALREAD
-    # VALREADTA
-    # VALWRIT
-    # VALWRITTA
-    # VALMAT
-    # VALMATTA
-    # VALSCI
-    # VALSCITA
-    # VALGPS
-    # READEXP
-    # MATEXP
-    # GPSEXP
-    # READHIGH
-    # MATHIGH
-    # GPSHIGH
-    # READAT
-    # MATAT
-    # GPSAT
-    # READLEVTA
-    # WRITLEVTA
-    # PRREADLEV
-    # PRWRITLEV
-    # PRMATLEV
-    # WELSHTALEV
-    # WELSHLEV
-    # ENGTIER
-    # READMRK
-    # GPSPAPER1MRK
-    # GPSPAPER2MRK
-    # GPSMRK
-    # MATPAPER2MRK
-    # MATPAPER3MRK
-    # MATARITHMRK
-    # MATMRK
-    # ENGWRITMRK
-    # ENGHNDWRMRK
-    # ENGSPELLMRK
-    # ENGTOTMRK
-    # ENGEXTMRK
-    # READLEV
-    # ENGWRITLEV
-    # ENGTALEV
-    # ENGMAINLEV
-    # ENGLEV
-    # ENGLEVTA
-    # ENGEXTLEV
-    # ENGPOINTS
-    # ENGFINE
-    # MATTIER
-    # MATTESTAMRK
-    # MATTESTBMRK
-    # MATARTHMRK
-    # MATTOTMRK
-    # MATEXTMRK
-    # MATTALEV
-    # MATMAINLEV
-    # MATLEV
-    # MATEXTLEV
-    # MATLEVTA
-    # MATPOINTS
-    # MATFINE
-    # SCILEVTA
-    # GPSLEV
-    # READFINE
-    # GPSFINE
-    # SCITIER
-    # SCITESTAMRK
-    # SCITESTBMRK
-    # SCITOTMRK
-    # SCIEXTMRK
-    # SCITALEV
-    # SCIMAINLEV
-    # SCILEV
-    # SCIEXTLEV
-    # SCIPOINTS
-    # SCIFINE
-    # SLTR
-    # SLTW
-    # SLTM
-    # SLT 
-    # HSLTR
-    # HSLTW
-    # HSLTM
-    # HSLT
-    # WRITTAEXP
-    # SCITAEXP
-    # MATTAEXP
-    # READTAEXP
-    # WRITTADEPTH
-    # WRITTAWTS
-    # WRITTABEXP
-    # SCITABEXP
-    # MATTABEXP
-    # READTABEXP
-    # WRITTAAD
-    # SCITAAD
-    # MATTAAD
-    # READTAAD
-    # ELIGRWM
-    # VALRWM
-    # RWMEXP
-    # RWMHIGH
-    # KS1AVERAGE
-    # INREADPROG
-    # INWRITPROG
-    # INMATPROG
-    # KS1AVERAGE_GRP
-    # KS1AVERAGE_GRP_P
-    # KS2READSCORE
-    # KS2WRITSCORE
-    # KS2MATSCORE
-    # KS2READPRED
-    # KS2WRITPRED
-    # KS2MATPRED
-    # KS2READPRED_P
-    # KS2WRITPRED_P
-    # KS2MATPRED_P
-    # READPROGSCORE
-    # WRITPROGSCORE
-    # MATPROGSCORE
-    # READPROGSCORE_P
-    # WRITPROGSCORE_P
-    # MATPROGSCORE_P
-    # READPROGSCORE_P_CAP
-    # WRITPROGSCORE_P_CAP
-    # MATPROGSCORE_P_CAP
-    # READPROGSCORE_P_ADJUSTED
-    # WRITPROGSCORE_P_ADJUSTED
-    # MATPROGSCORE_P_ADJUSTED
-    # LEVLENG
-    # LEVLMAT
-    # LEVLSCI
-    # LEVLEMS
-    # LEVLEMSTA
-    # LEVXREAD
-    # LEVXREADTA
-    # LEVXWRIT
-    # LEVXWRITTA
-    # LEVXENG
-    # LEVXENGTA
-    # LEVXMAT
-    # LEVXMATTA
-    # LEVXGPS
-    # LEV4BREAD
-    # LEV4BMAT
-    # LEV4BGPS
-    # LEVXSCITA
-    # LEVXSCITA
-    # LEVXENGMAT
-    # LEVXEMS
-    # LEVXEMSTA
-    # LEVAXREAD
-    # LEVAXREADTA
-    # LEVAXWRIT
-    # LEVAXWRITTA
-    # LEVAXENG
-    # LEVAXENGTA
-    # LEVXSCITA
-    # LEVAXMAT
-    # LEVAXMATTA
-    # LEVAXGPS
-    # LEVAXENGMAT
-    # LEVAXSCI
-    # LEVAXSCITA
-    # LEVAXEMS
-    # LEVAXEMSTA
-    # LEVBXREAD
-    # LEVBXREADTA
-    # LEVBXWRIT
-    # LEVBXWRITTA
-    # LEVBXENG
-    # LEVBXENGTA
-    # LEVBXMAT
-    # LEVBXENGMAT
-    # LEVBXMATTA
-    # LEVBXGPS
-    # LEV6READ
-    # LEV6MAT
-    # LEV6GPS
-    # LEVXREADWRITTAMAT
-    # LEVAXREADWRITTAMAT
-    # LEVBXREADWRITTAMAT
-    # LEV4BREADWRITTAMAT
-    # LEVBXSCITA
-    # LEVBXEMSTA
-    # LEV6READMAT
-    # LEVADREADTA
-    # LEVADWRITTA
-    # LEVADENGTA
-    # LEVADMATTA
-    # LEVADSCITA
-    # LEVATENG
-    # LEVATREAD
-    # LEVATGPS
-    # LEVATMAT
-    # LEV6ENGTA
-    # LEV6MATTA
-    # LEV6SCITA
-    # LEV6READTA
-    # LEV6WRITTA
-    # LEVATSCI
-    # TOTPTS
-    # APSDENS
-    # APSDENN
-    # APSDENNMTS
-    # VAINPUT
-    # VAOUTPUT
-    # MEDIAN
-    # VASCOREP
-    # READLEVKS1
-    # READLEVKS2
-    # WRITLEVKS1
-    # WRITLEVKS2
-    # ENGLEVKS1
-    # ENGLEVKS2
-    # MATHLEVKS1
-    # MATHLEVKS2
-    # PROGENG12
-    # PROGREAD12
-    # PROGWRIT12 
-    # PROGMATH12 
-    # ENGLEVKS2TA
-    # MATHLEVKS2TA
-    # PROGENG12TA
-    # PROGMATH12TA
-    # FLAGENG12TA
-    # FLAGMATH12TA
-    # FLAG2KENG12
-    # PROGENG12FLAG
-    # FLAG2KREAD12
-    # FLAG2KWRIT12
-    # FLAG2KMATH12
-    # PROGMAT12FLAG
-    # READLEVKS1
-    # READLEVKS2
-    # PROGREAD12
-    # PROGREAD12FLAG
-    # WRITLEVKS1
-    # WRITTALEVKS2
-    # PROGWRITTA12
-    # PROGWRITTA2Flag
-    # INCVA
-    # INKS12VA
-    # INMLWIN
-    # CVAPAPS
-    # KS1APS
-    # CVAAPS
-    # KS2APSFG
-    # CVAPREAD
-    # KS1READPS
-    # CVAPWRIT
-    # KS1WRITPS
-    # CVAPMAT
-    # KS1MATPS (previously CVAPMAT)
-    # KS1AVERAGEPS
-    # KS1READPS_P
-    # KS1WRITPS_P
-    # KS1MATPS_P
-    # KS1_PSNUMPS
-    # KS1_PSUSINGPS
-    # KS1_PSSHAPEPS
-    # KS1_PSMATHSAV
-    # CVAPRED
-    # CVASCORE
-    # KS1EXP
-    # EALGRP
-    # KS1APS2
-    # KS1APS3
-    # KS2READPS
-    # KS2MATPS
-    # KS2WRITTAPS
-    # APS
-    # KS2ENGFG
-    # KS2READFG
-    # KS2MATFG
-    # KS2WRITTAFG
-    # KS2APSFG
-    # VAAPSSCORE
-    # VAENGSCORE
-    # VAMATSCORE
-    # VAAPSPRED1
-    # VAAPSPRED
-    # VAENGPRED1
-    # VAENGPRED
-    # VAMATPRED1
-    # VAMATPRED
-    # VAOPred1
-    # VAOPred
-    # VAOScore
-    # VAMATPred1
-    # VAMATPred
-    # VAMATScore
-    # VAREADPred1
-    # VAREADPred
-    # VAREADScore
-    # VAWRITTAPred1
-    # VAWRITTAPred
-    # VAWRITTAScore
-    # PAPSSQ
-    # PE_DEV
-    # PR_DEV
-    # PM_DEV
-    # KS1GROUP
-    # PSENG
-    # PSREAD
-    # PSWRITE
-    # PSSPEAK
-    # PSLISTEN
-    # PSMATHS
-    # PSNUM
-    # PSUSING
-    # PSSHAPE
-    # PSSCIENCE
-    # EAL_PAPS
-    # EAL_PAPSSQ
-    # MOB1
-    # MOB2
-    # MOB3
-    # NEWMOBILE
-    # SLTPILOT
-    # SLT_APP
-    # REFTEST
-    # REFTA
-    # VERSION
+      acadyr: academic_year, 
+      # pupilid
+      candno: rand(9999999),
+      # matchref
+      # dcaref
+      # ndcref
+      # npdref
+      # checkref
+      # cand_id
+      # upn
+      surname: Faker::Name.last_name,
+      forenames: "#{Faker::Name.first_name} #{Faker::Name.middle_name}",
+      dob: dob,
+      age_start: age_start,
+      month_part: rand(11),
+      yearofbirth: dob.year,
+      monthofbirth: dob.month,
+      examdob: dob,
+      plascdob: dob,
+      yeargrp: rand(17),
+      actyrgrp: (['N1', 'N2', 'R'] + (1..14).to_a).sample,
+      # ethnic
+      # sourcee
+      gender: is_female ? 'F': 'M',
+      idaci: Random.new.rand(1.0),
+      rawgender: Random.new.rand(1.0) > 0.5 ? 'M' : 'F',
+      refugee: is_refugee ? 'Y' : 'N',
+      rawla: local_authority_id,
+      la: local_authority_id,
+      la_9code: "#{local_authority_id}#{local_authority_id}#{local_authority_id}",
+      rawestab: estab,
+      estab: estab,
+      laestab: "#{local_authority_id}#{estab}",
+      entrydat: is_refugee ? date_rand(from: Date.new(academic_year-5,1,1).to_time) : nil,
+      bestleae: rand_exam_id,
+      bascleae: rand_exam_id,
+      # urn
+      # urn_ac
+      # open_ac
+      # toe_code (school tables type of establishment code)
+      nftype: nftype,
+      mmsch: ((20..25).to_a + (50..52).to_a).include?(nftype) ? 1 : 0,
+      mmsch2: (21..24).to_a.include?(nftype) ? 1 : 0,
+      msch: (21..24).to_a.include?(nftype) ? 1 : 0,
+      msch2: ((20..27).to_a + (50..53).to_a + [55]).include?(nftype) ? 1 : 0,
+      # amend
+      # amdpupil
+      sourcecty: ['E', 'W', 'O'].sample,
+      langsch: ['E', 'W'].sample,
+      langmatta: ['C', 'E', 'M'].sample,
+      langscita: ['C', 'E', 'M'].sample,
+      endks: rand(2),
+      # enrolsts
+      # preleae
+      # nentries
+      # examyear_en
+      # examyear_re
+      # examyear_gps
+      # examyear_ma
+      # examyear_sc
+      schres: Random.new.rand(1.0) > 0.9 ? 0 : 1,
+      lares: Random.new.rand(1.0) > 0.9 ? 0 : 1,
+      natres: Random.new.rand(1.0) > 0.9 ? 0 : 1,
+      natmtdres: Random.new.rand(1.0) > 0.9 ? 0 : 1,
+      npdden_la: Random.new.rand(1.0) > 0.9 ? 0 : 1,
+      npdden_nat: Random.new.rand(1.0) > 0.9 ? 0 : 1,
+      schresta: Random.new.rand(1.0) > 0.9 ? 0 : 1,
+      laresta: Random.new.rand(1.0) > 0.9 ? 0 : 1,
+      natresta: Random.new.rand(1.0) > 0.9 ? 0 : 1,
+      natmtdresta: Random.new.rand(1.0) > 0.9 ? 0 : 1,
+      # readoutcome
+      # matoutcome
+      # gpsoutcome
+      readscore: rand(999),
+      matscore: rand(999),
+      gpsscore: rand(999),
+      # writtaoutcome
+      # scitaoutcome
+      # mattaoutcome
+      # readtaoutcome (see codesets)
+      eligread: rand(2),
+      eligreadta: rand(2),
+      eligwrit: rand(2),
+      eligwritta: rand(2),
+      eligeng: rand(2),
+      eligengta: rand(2),
+      eligmat: rand(2),
+      eligmatta: rand(2),
+      eligengla: rand(2),
+      eligreadla: rand(2),
+      eligwritla: rand(2),
+      eliggpsla: rand(2),
+      eligwrittala: rand(2),
+      eligrwmla: rand(2),
+      eligmatla: rand(2),
+      eligsci: rand(2),
+      eligscita: rand(2),
+      eligreadwrittamat: rand(2),
+      valreadwrittamat: rand(2),
+      eliggps: rand(2),
+      valeng: rand(2),
+      valengta: rand(2),
+      valread: rand(2),
+      valreadta: rand(2),
+      writtaexp: rand(2),
+      scitaexp: rand(2),
+      mattaexp: rand(2),
+      readtaexp: rand(2),
+      writtadepth: rand(2),
+      writtawts: rand(2),
+      writtabexp: rand(2),
+      scitabexp: rand(2),
+      mattabexp: rand(2),
+      readtabexp: rand(2),
+      writtaad: rand(2),
+      scitaad: rand(2),
+      mattaad: rand(2),
+      readtaad: rand(2),
+      eligrwm: rand(2),
+      valrwm: rand(2),
+      rwmexp: rand(2),
+      rwmhigh: rand(2),
+      ks1average: rand(3..27),
+      valwrit: rand(2),
+      valwritta: rand(2),
+      valmat: rand(2),
+      valmatta: rand(2),
+      valsci: rand(2),
+      valscita: rand(2),
+      valgps: rand(2),
+      readexp: rand(2),
+      matexp: rand(2),
+      gpsexp: rand(2),
+      readhigh: rand(2),
+      mathigh: rand(2),
+      gpshigh: rand(2),
+      readat: rand(2),
+      matat: rand(2),
+      gpsat: rand(2),
+      readlevta: rand(2),
+      writlevta: rand(2),
+      prreadlev: %i(A D W 1 2C 2B 2A 3 4).sample,
+      prwritlev: %i(A D W 1 2C 2B 2A 3 4).sample,
+      prmatlev: %i(A D W 1 2C 2B 2A 3 4).sample,
+      welshtalev: ['A','D','L','N','W',1,2,3,4,5, nil].sample,
+      welshlev: ['A','D','L','N','W',1,2,3,4,5, nil].sample,
+      engtier: %i(35 A B F IN L M P T Y Z).sample,
+      readmrk: (['A', 'IN', 'M'] + (0..50).to_a).sample,
+      gpspaper1mrk: (['A', 'IN', 'M'] + (0..50).to_a).sample,
+      gpspaper2mrk: (['A', 'IN', 'M'] + (0..20).to_a).sample,
+      gpsmrk: (['A', 'IN', 'M'] + (0..70).to_a).sample,
+      matpaper2mrk: (['A', 'IN', 'M'] + (0..35).to_a).sample,
+      matpaper3mrk: (['A', 'IN', 'M'] + (0..35).to_a).sample,
+      matarithmrk: (['A', 'IN', 'M'] + (0..40).to_a).sample,
+      matmrk: (['A', 'IN', 'M'] + (0..110).to_a).sample,
+      ks1_pseng: (%i(NOTSEN P1i P1ii P2i P2ii P3i P3ii) + [nil]).sample,
+      ks1_psread: (%i(NOTSEN P4 P5 P6 P7 P8) + [nil]).sample,
+      ks1_pswrite: (%i(NOTSEN P4 P5 P6 P7 P8) + [nil]).sample,
+      ks1_psspeak: (%i(NOTSEN P4 P5 P6 P7 P8) + [nil]).sample,
+      ks1_pslisten: (%i(NOTSEN P4 P5 P6 P7 P8) + [nil]).sample,
+      ks1_psmaths: (%i(NOTSEN P1i P1ii P2i P2ii P3i P3ii) + [nil]).sample,
+      ks1_psnum: (%i(NOTSEN P4 P5 P6 P7 P8) + [nil]).sample,
+      ks1_psusing: (%i(NOTSEN P4 P5 P6 P7 P8) + [nil]).sample,
+      ks1_psshape: (%i(NOTSEN P4 P5 P6 P7 P8) + [nil]).sample,
+      engwritmrk: (['A', 'IN', 'M'] + (0..50).to_a).sample,
+      enghndwrmrk: ((0..5).to_a + ['_NV']).sample,
+      engspellmrk: ((0..10).to_a + ['_NV']).sample,
+      engtotmrk: (['A', 'IN', 'M'] + (0..100).to_a).sample,
+      engextmrk: ((0..34).to_a + ['_NV']).sample,
+      readlev: ((3..6).to_a + %i(A B F IN L M N P Q S T X Y Z)).sample,
+      engwritlev: ((3..6).to_a + %i(A B F IN L M N P Q S T X Y Z)).sample,
+      engtalev: ((2..5).to_a + %i(A B F IN L M N P Q S T X Y Z)).sample,
+      engmainlev: %i(2 3 4 5 A B D L M N Q X Z _X).sample,
+      englev: ((2..5).to_a + %i(A B F IN L M N P Q S T X Y Z)).sample,
+      englevta: ((1..6).to_a + %i(A D F IN L M P W Z)).sample,
+      # engextlev
+      engpoints: [0, 15, 21, 27, 33, 39, 45, 51].sample,
+      engfine: format('%.1f', Random.new.rand(5.5) + 2.5),
+      mattier: %i(35 A B F H IN L M P T Y Z).sample,
+      mattestamrk: (['A', 'IN', 'M'] + (0..40).to_a).sample,
+      mattestbmrk: (['A', 'IN', 'M'] + (0..40).to_a).sample,
+      matarthmrk: (['A', 'IN', 'M'] + (0..20).to_a).sample,
+      mattotmrk: (['A', 'IN', 'M'] + (0..100).to_a).sample,
+      matextmrk: (['_NV'] + (0..30).to_a).sample,
+      mattalev: %i(1 2 3 4 5 6 A D F L M N P W Y Z IN _X).sample,
+      matmainlev: %i(2 3 4 5 6 A B D L M N Q X Y Z _X).sample,
+      matlev: %i(2 3 4 5 6 A H L M N Q S W X).sample,
+      matlevta: %i(1 2 3 4 5 6 A D F IN L M P W Z).sample,
+      matextlev: %i(6 _X).sample,
+      matpoints: [0, 15, 21, 27, 33, 39, 45, 51].sample,
+      matfine: format('%.1f', Random.new.rand(5.5) + 2.5),
+      scitier: %i(2 35 A B D E F L M P T Y Z IN _X,).sample,
+      scitestamrk: ((0..40).to_a + %i(A M _NV)).sample,
+      scitestbmrk: ((0..40).to_a + %i(A M _NV)).sample,
+      scitotmrk: ((0..80).to_a + %i(A M _NV)).sample,
+      sciextmrk: ((0..30).to_a + %i(A M _NV)).sample,
+      scitalev: ((1..6).to_a + %i(A D F L M N P W Y Z IN _X)).sample,
+      scimainlev: %i(2 3 4 5 A B D L M N Q Z _X).sample,
+      scilev: %i(1 2 3 4 5 A B D F L M N P Q T W).sample,
+      scilevta: ((1..6).to_a + %i(A D F IN L M P W Z)).sample,
+      gpslev: ((1..6).to_a + %i(A D F IN L M P W Z)).sample,
+      readfine: format('%.1f', Random.new.rand(4) + 2.5),
+      gpsfine: format('%.1f', Random.new.rand(4) + 2.5),
+      sciextlev: %i(6 _X).sample,
+      scipoints: [15, 21, 27, 33].sample,
+      # scifine
+      levleng: rand(2),
+      levlmat: rand(2),
+      levlsci: rand(2),
+      levlems: rand(2),
+      levlemsta: rand(2),
+      levxread: rand(2),
+      levxreadta: rand(2),
+      levxwrit: rand(2),
+      levxwritta: rand(2),
+      levxeng: rand(2),
+      levxengta: rand(2),
+      levxmat: rand(2),
+      levxmatta: rand(2),
+      levxgps: rand(2),
+      lev4bread: rand(2),
+      lev4bmat: rand(2),
+      lev4bgps: rand(2),
+      levxsci: rand(2),
+      levxscita: rand(2),
+      levxengmat: rand(2),
+      levxems: rand(2),
+      levxemsta: rand(2),
+      levaxread: rand(2),
+      levaxreadta: rand(2),
+      levaxwrit: rand(2),
+      levaxwritta: rand(2),
+      levaxeng: rand(2),
+      levaxengta: rand(2),
+      levaxmat: rand(2),
+      levaxmatta: rand(2),
+      levaxgps: rand(2),
+      levaxengmat: rand(2),
+      levaxsci: rand(2),
+      levaxscita: rand(2),
+      levaxems: rand(2),
+      levaxemsta: rand(2),
+      levbxread: rand(2),
+      levbxreadta: rand(2),
+      levbxwrit: rand(2),
+      levbxwritta: rand(2),
+      levbxeng: rand(2),
+      levbxengta: rand(2),
+      levbxmat: rand(2),
+      levbxengmat: rand(2),
+      levbxmatta: rand(2),
+      levbxgps: rand(2),
+      lev6read: rand(2),
+      lev6mat: rand(2),
+      lev6gps: rand(2),
+      levxreadwrittamat: rand(2),
+      levaxreadwrittamat: rand(2),
+      levbxreadwrittamat: rand(2),
+      lev4breadwrittamat: rand(2),
+      levbxscita: rand(2),
+      levbxemsta: rand(2),
+      lev6readmat: rand(2),
+      levadreadta: rand(2),
+      levadwritta: rand(2),
+      levadengta: rand(2),
+      levadmatta: rand(2),
+      levadscita: rand(2),
+      levateng: rand(2),
+      levatread: rand(2),
+      levatgps: rand(2),
+      levatmat: rand(2),
+      lev6engta: rand(2),
+      lev6matta: rand(2),
+      lev6scita: rand(2),
+      lev6readta: rand(2),
+      lev6writta: rand(2),
+      levatsci: rand(2),
+      totpts: (0..99).to_a.sample,
+      apsdens: rand(3),
+      apsdenn: rand(3),
+      apsdennmts: rand(3),
+      readlevks1: rand(5),
+      # readlevks2
+      writlevks1: rand(5),
+      # writlevks2
+      englevks1: rand(5),
+      englevks2: rand(7),
+      mathlevks1: rand(5),
+      mathlevks2: rand(7),
+      progeng12: rand(-3..6),
+      progread12: rand(-2..5),
+      progwrit12: rand(-2..5),
+      progmath12: rand(-2..5),
+      englevks2ta: rand(0..8),
+      mathlevks2ta: rand(0..8),
+      scilevks2ta: rand(-3..6),
+      progeng12ta: rand(-4..8),
+      progmath12ta: rand(-4..8),
+      flageng12ta: rand(2),
+      flagmath12ta: rand(2),
+      flag2keng12: rand(2),
+      progeng12flag: rand(2),
+      flag2kread12: rand(2),
+      flag2kwrit12: rand(2),
+      flag2kmath12: rand(2),
+      progmat12flag: rand(2),
+      progread12flag: rand(2),
+      writtalevks2: ((0..6).to_a + [nil]).sample,
+      progwritta12: ((-3..6).to_a + [nil]).sample,
+      progwritta12flag: [1,2,nil].sample,
+      vainput: [27, 21, 17, 15, 13, 9, 3].sample,
+      vaoutput: [33, 27, 21, 17, 15, 13, 9, 3].sample,
+      median: format('%.1f', Random.new.rand(34)),
+      vascorep: ((0..16).to_a + (-1..-18).to_a).sample,
+      incva: rand(2),
+      inks12va: rand(2),
+      inmlwin: rand(2),
+      # cvapaps
+      # ks1aps
+      # cvaaps
+      # ks2apsfg
+      cvapread: %i(A D L M W X 1 2C 2B).sample,
+      # ks1readps
+      cvapwrit: %i(A D L M W X 1 2C 2B).sample,
+      # ks1writps
+      cvapmat: %i(A D L M W X 1 2C 2B).sample,
+      # ks1matps
+      ks1averageps: format('%.2f', Random.new.rand(26.75) + 0.25),
+      ks1readps_p: format('%.2f', Random.new.rand(26.75) + 0.25),
+      ks1writps_p: format('%.2f', Random.new.rand(26.75) + 0.25),
+      ks1matps_p: format('%.2f', Random.new.rand(26.75) + 0.25),
+      ks1_psnumps: format('%.2f', Random.new.rand(25.25) + 1.75),
+      # ks1_psusingps
+      # ks1_psshapeps
+      # ks1_psmathsav
+      # cvapred
+      # cvascore
+      # ks1exp
+      # ealgrp
+      # ks1aps2
+      # ks1aps3
+      ks2readps: [15, 21, 27, 33, 39].sample,
+      ks2matps: [15, 21, 27, 33, 39].sample,
+      ks2writtaps: [3, 9, 15, 21, 27, 33, 39].sample,
+      aps: format('%.2f', Random.new.rand(36.0) + 3),
+      ks2engfg: format('%.2f', Random.new.rand(36.0) + 3),
+      ks2readfg: format('%.2f', Random.new.rand(36.0) + 3),
+      ks2matfg: format('%.2f', Random.new.rand(36.0) + 3),
+      ks2writtafg: Random.new.rand(36.0) + 3,
+      # vaapsscore
+      # vaengscore
+      # vamatscore
+      # vaapspred1
+      # vaapspred
+      # vaengpred1
+      # vaengpred
+      # vaopred1
+      vaopred: rand(36) + 3,
+      # vaoscore
+      # vamatpred1
+      vamatpred: rand(36) + 3,
+      # vareadpred1
+      vareadpred: rand(36) + 3,
+      # vareadscore
+      # vawrittapred1
+      vawrittapred: rand(36) + 3,
+      # vawrittascore
+      # papssq
+      # pe_dev
+      # pr_dev
+      # pm_dev
+      pseng: (%i(NOTSEN P1i P1ii p2i P2ii P3i P3ii) + [nil]).sample,
+      psread: (%i(NOTSEN P4 P5 P5 P6 P7 P8) + [nil]).sample,
+      pswrite: (%i(NOTSEN P4 P5 P5 P6 P7 P8) + [nil]).sample,
+      psspeak: (%i(NOTSEN P4 P5 P5 P6 P7 P8) + [nil]).sample,
+      pslisten: (%i(NOTSEN P4 P5 P5 P6 P7 P8) + [nil]).sample,
+      psmaths: (%i(NOTSEN P4 P5 P5 P6 P7 P8) + [nil]).sample,
+      psnum: (%i(NOTSEN P4 P5 P5 P6 P7 P8) + [nil]).sample,
+      psusing: (%i(NOTSEN P4 P5 P5 P6 P7 P8) + [nil]).sample,
+      psshape: (%i(NOTSEN P4 P5 P5 P6 P7 P8) + [nil]).sample,
+      psscience: (%i(NOTSEN P1i P1ii p2i P2ii P3i P3ii P4 P5 P5 P6 P7 P8) + [nil]).sample,
+      inreadprog: rand(2),
+      inwritprog: rand(2),
+      inmatprog: rand(2),
+      # ks1average_grp
+      # ks1average_grp_p
+      # ks2readscore
+      # ks2writscore
+      # ks2matscore
+      # ks2readpred
+      # ks2writpred
+      # ks2matpred
+      # ks2readpred_p
+      # ks2writpred_p
+      # ks2matpred_p
+      # readprogscore
+      # writprogscore
+      # matprogscore
+      # readprogscore_p
+      # writprogscore_p
+      # matprogscore_p
+      cla_6_months: is_cla ? (cla_months > 6 ? 1 : 0) : nil,
+      cla_12_months: is_cla ? (cla_months > 12 ? 1 : 0) : nil,
+      cla_pp_6_months: is_cla ? (cla_months > 6 ? 1 : 0) : 0,
+      cla_pp_1_day: is_cla ? 1 : [0, 1].sample,
+      fsm: is_fsm ? 1 : 0,
+      fsm6: is_fsm ? 1 : [0, 1].sample,
+      fsm6_p: is_fsm ? 1 : [0, 1].sample,
+      fsm6_cla: (is_fsm or is_cla) ? 1 : 0,
+      fsm6cla1a: (is_fsm or is_cla) ? 1 : 0,
+      ks1group: (1..4).to_a.sample,
+      adoptedfromcare_allyears: %i(N A G R C). sample,
+      senf: %i(A P S N K E).sample,
+      sentype: (%i(SPLD MLD SLD PMLD BESD SLCN HI VI MSI PD ASD OTH) + [nil]).sample,
+      age: age_start,
+      female: is_female ? 1 : 0,
+      senps: rand(2),
+      sena: rand(2),
+      flang: Random.new.rand(1.0) > 0.9 ? 0 : 1,
+      incareev: rand(2),
+      wiri: ethnicity == 'wiri' ? 1 : 0,
+      wirt: ethnicity == 'wirt' ? 1 : 0,
+      wrom: ethnicity == 'wrom' ? 1 : 0,
+      woth: ethnicity == 'woth' ? 1 : 0,
+      mwbc: ethnicity == 'mwbc' ? 1 : 0,
+      mwba: ethnicity == 'mwba' ? 1 : 0,
+      mwas: ethnicity == 'mwas' ? 1 : 0,
+      moth: ethnicity == 'moth' ? 1 : 0,
+      aind: ethnicity == 'aind' ? 1 : 0,
+      apkn: ethnicity == 'apkn' ? 1 : 0,
+      aban: ethnicity == 'aban' ? 1 : 0,
+      aoth: ethnicity == 'aoth' ? 1 : 0,
+      bcrb: ethnicity == 'bcrb' ? 1 : 0,
+      bafr: ethnicity == 'bafr' ? 1 : 0,
+      both: ethnicity == 'both' ? 1 : 0,
+      chne: ethnicity == 'chne' ? 1 : 0,
+      ooth: ethnicity == 'ooth' ? 1 : 0,
+      uncla: ethnicity == 'uncla' ? 1 : 0,
+      fsmwiri: ethnicity == 'wiri' ? 1 : 0,
+      fsmwirt: ethnicity == 'wirt' ? 1 : 0,
+      fsmwrom: ethnicity == 'wrom' ? 1 : 0,
+      fsmwoth: ethnicity == 'woth' ? 1 : 0,
+      fsmmwbc: ethnicity == 'mwbc' ? 1 : 0,
+      fsmmwba: ethnicity == 'mwba' ? 1 : 0,
+      fsmmwas: ethnicity == 'mwas' ? 1 : 0,
+      fsmmoth: ethnicity == 'moth' ? 1 : 0,
+      fsmaind: ethnicity == 'aind' ? 1 : 0,
+      fsmapkn: ethnicity == 'apkn' ? 1 : 0,
+      fsmaban: ethnicity == 'aban' ? 1 : 0,
+      fsmaoth: ethnicity == 'aoth' ? 1 : 0,
+      fsmbcrb: ethnicity == 'bcrb' ? 1 : 0,
+      fsmbafr: ethnicity == 'bafr' ? 1 : 0,
+      fsmboth: ethnicity == 'both' ? 1 : 0,
+      fsmchne: ethnicity == 'chne' ? 1 : 0,
+      fsmooth: ethnicity == 'ooth' ? 1 : 0,
+      fsmuncla:  ethnicity == 'uncla' ? 1 : 0,
+      eal_paps: rand(2),
+      eal_papssq: rand(2),
+      mob1: joined_school_years_ago == 0,
+      mob2: joined_school_years_ago == 1,
+      mob3: joined_school_years_ago >=2 && joined_school_years_ago <=3,
+      # lang
+      # lang1st
+      senelk: rand(2),
+      senele: rand(2),
+      senelse: rand(2),
+      senelapk: rand(2),
+      newmobile: joined_school_years_ago == 0,
+      ppcode: Faker::Address.postcode,
+      sltpilot: rand(2),
+      slt_app: rand(2),
+      reftest: [0, 0, 0, 0, 0, 0, 9, 2, 1].sample,
+      refta: [0, 0, 0, 0, 0, 0, 0, 9, 1].sample,
+      # contflag
+      version: ['U', 'A', 'F'].sample,
+      # releaseflag
+      readspeccon: [0,1,2].sample,
+      matspeccon: [0,1,2].sample,
+      gpsspeccon: [0,1,2].sample,
+      # readprogscore_p_adjusted
+      # writprogscore_p_adjusted
+      # matprogscore_p_adjusted
+      # ks2_psnumps
+      # ks2_psusingps
+      # ks2_psshapeps
+      # ks2_psmathsav
+      plaa: %i(N A G W C).sample,
+      pcode: Faker::Address.postcode
+    )
+  end
+
+  private
+  def age_at(dob, date_of_measurement)
+    now = Time.now.utc.to_date
+    now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+  end
+
+  def months_between(date1, date2)
+    # https://stackoverflow.com/questions/9428605/find-number-of-months-between-two-dates-in-ruby-on-rails
+    (date2.year * 12 + date2.month) - (date1.year * 12 + date1.month)
+  end
+
+  def rand_exam_id
+    rand(2010000..9389999)
+  end
+
+  # https://stackoverflow.com/questions/4894198/how-to-generate-a-random-date-in-ruby
+    def date_rand(from: 0.0, to: Time.now)
+      Time.at(from + rand * (to.to_f - from.to_f)).to_date
   end
 end
 
-App.new.create_pupils(count: 2)
+App.new.create_pupils(count: 100)
 
-puts Ks2Pupil.all.to_a
+puts "There are now #{Ks2Pupil.count} records"
