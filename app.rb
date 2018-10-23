@@ -51,8 +51,8 @@ class App
       dcaref: SecureRandom.uuid[0...9],
       ndcref: SecureRandom.uuid[0...9],
       npdref: SecureRandom.uuid[0...9],
-      # checkref # not in datatables
-      # cand_id # only 2002/2003
+      checkref: rand(100000), # Not in data tables, see KS2_NPDPT_Output_2016
+      cand_id: academic_year == 2002 ? rand(999999999) : nil,
       upn: SecureRandom.uuid[0...13],
       surname: Faker::Name.last_name,
       forenames: "#{Faker::Name.first_name} #{Faker::Name.middle_name}",
@@ -66,7 +66,7 @@ class App
       yeargrp: rand(17),
       actyrgrp: (['N1', 'N2', 'R'] + (1..14).to_a).sample,
       ethnic: ethnicity,
-      # sourcee # not in datatables
+      sourcee: academic_year <= 2015 ? %i(C P S T O).sample : nil, # removed in 2016
       gender: is_female ? 'F': 'M',
       idaci: Random.new.rand(1.0),
       rawgender: Random.new.rand(1.0) > 0.5 ? 'M' : 'F',
@@ -96,7 +96,7 @@ class App
       langmatta: ['C', 'E', 'M'].sample,
       langscita: ['C', 'E', 'M'].sample,
       endks: rand(2),
-      # enrolsts
+      enrolsts: %i(A C M S G O).sample, # see KS2_NPDPT_Output_2016
       preleae: rand(2010000..9389999),
       nentries: rand(1..4),
       examyear_en: academic_year,
@@ -326,9 +326,9 @@ class App
       apsdenn: rand(3),
       apsdennmts: rand(3),
       readlevks1: rand(5),
-      # readlevks2
+      readlevks2: ((0..6).to_a + [nil]).sample
       writlevks1: rand(5),
-      # writlevks2
+      writlevks2: ((0..6).to_a + [nil]).sample
       englevks1: rand(5),
       englevks2: rand(7),
       mathlevks1: rand(5),
@@ -361,30 +361,30 @@ class App
       incva: rand(2),
       inks12va: rand(2),
       inmlwin: rand(2),
-      # cvapaps (KS1 average point score)
-      # ks1aps (KS1 average point score)
-      # cvaaps (KS2 average point score (fg))
-      # ks2apsfg (KS2 average point score (fg))
+      cvapaps: Random.new.rand(24.0) + 3,
+      ks1aps: Random.new.rand(24.0) + 3,
+      cvaaps: Random.new.rand(36.0) + 3,
+      ks2apsfg: Random.new.rand(36.0) + 3,
       cvapread: %i(A D L M W X 1 2C 2B).sample,
-      # ks1readps
+      ks1readps: Random.new.rand(24.0) + 3,
       cvapwrit: %i(A D L M W X 1 2C 2B).sample,
-      # ks1writps
+      ks1writps: Random.new.rand(24.0) + 3,
       cvapmat: %i(A D L M W X 1 2C 2B).sample,
-      # ks1matps
+      ks1matps: Random.new.rand(24.0) + 3,
       ks1averageps: format('%.2f', Random.new.rand(26.75) + 0.25),
       ks1readps_p: format('%.2f', Random.new.rand(26.75) + 0.25),
       ks1writps_p: format('%.2f', Random.new.rand(26.75) + 0.25),
       ks1matps_p: format('%.2f', Random.new.rand(26.75) + 0.25),
       ks1_psnumps: format('%.2f', Random.new.rand(25.25) + 1.75),
-      # ks1_psusingps
-      # ks1_psshapeps
-      # ks1_psmathsav
-      # cvapred
-      # cvascore
-      # ks1exp
-      # ealgrp
-      # ks1aps2
-      # ks1aps3
+      ks1_psusingps: Random.new.rand(1.25) + 1.75,
+      ks1_psshapeps: Random.new.rand(1.25) + 1.75,
+      ks1_psmathsav: Random.new.rand(1.25) + 1.75,
+      cvapred: Random.new.rand(36.0) + 3,
+      cvascore: Random.new.rand(36.0) + 3,
+      ks1exp: rand(1..4),
+      ealgrp: rand(1..3),
+      ks1aps2: (Random.new.rand(24.0) + 3)**2,
+      ks1aps3: (Random.new.rand(24.0) + 3)**3,
       ks2readps: [15, 21, 27, 33, 39].sample,
       ks2matps: [15, 21, 27, 33, 39].sample,
       ks2writtaps: [3, 9, 15, 21, 27, 33, 39].sample,
@@ -405,7 +405,7 @@ class App
       vaoscore: rand(36) + 3,
       vamatpred1: rand(36) + 3,
       vamatpred: rand(36) + 3,
-      # vareadpred1
+      vareadpred1: rand(36) + 3,
       vareadpred: rand(36) + 3,
       vareadscore: rand(36) + 3,
       vawrittapred1: rand(36) + 3,
@@ -506,7 +506,7 @@ class App
       mob2: joined_school_years_ago == 1,
       mob3: joined_school_years_ago >=2 && joined_school_years_ago <=3,
       # lang (not in data tables)
-      # lang1st (not in data tables)
+      lang1st: %i(ENG ENB OTH OTB REF NOT).sample,
       senelk: rand(2),
       senele: rand(2),
       senelse: rand(2),
@@ -517,7 +517,7 @@ class App
       slt_app: rand(2),
       reftest: [0, 0, 0, 0, 0, 0, 9, 2, 1].sample,
       refta: [0, 0, 0, 0, 0, 0, 0, 9, 1].sample,
-      # contflag (not in data tables)
+      contflag: rand(0..1), # see KS2_NPDPT_Output_2016
       version: ['U', 'A', 'F'].sample,
       releaseflag: 0,
       readspeccon: [0,1,2].sample,
