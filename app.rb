@@ -1,16 +1,17 @@
 require 'dotenv'
 require 'faker'
 require 'sequel'   
+require 'securerandom'
 
 Dotenv.load
-
 Faker::Config.locale = 'en-GB'
 
 DB = Sequel.connect(adapter: 'tinytds', 
                     host: 'localhost', 
                     database: 'Repository_Live', 
                     user: ENV['MSSQL_USERNAME'] || 'sa', 
-                    password: ENV['MSSQL_PASSWORD'])
+                    password: ENV['MSSQL_PASSWORD'],
+                    timeout: 60)
 
 require './ks2_pupil'
 
@@ -36,21 +37,23 @@ class App
 
     is_refugee = Random.new.rand(1.0) > 0.9
 
+    is_open_academy = Random.new.rand(1.0) > 0.8
+
     joined_school_years_ago = rand(5)
 
     nftype = (10..60).to_a.sample
 
     Ks2Pupil.new(
       acadyr: academic_year, 
-      # pupilid
+      pupilid: rand(2_147_483_647),
       candno: rand(9999999),
-      # matchref
-      # dcaref
-      # ndcref
-      # npdref
-      # checkref
-      # cand_id
-      # upn
+      matchref: SecureRandom.uuid[0...11],
+      dcaref: SecureRandom.uuid[0...9],
+      ndcref: SecureRandom.uuid[0...9],
+      npdref: SecureRandom.uuid[0...9],
+      # checkref # not in datatables
+      # cand_id # only 2002/2003
+      upn: SecureRandom.uuid[0...13],
       surname: Faker::Name.last_name,
       forenames: "#{Faker::Name.first_name} #{Faker::Name.middle_name}",
       dob: dob,
@@ -62,8 +65,8 @@ class App
       plascdob: dob,
       yeargrp: rand(17),
       actyrgrp: (['N1', 'N2', 'R'] + (1..14).to_a).sample,
-      # ethnic
-      # sourcee
+      ethnic: ethnicity,
+      # sourcee # not in datatables
       gender: is_female ? 'F': 'M',
       idaci: Random.new.rand(1.0),
       rawgender: Random.new.rand(1.0) > 0.5 ? 'M' : 'F',
@@ -77,30 +80,30 @@ class App
       entrydat: is_refugee ? date_rand(from: Date.new(academic_year-5,1,1).to_time) : nil,
       bestleae: rand_exam_id,
       bascleae: rand_exam_id,
-      # urn
-      # urn_ac
-      # open_ac
-      # toe_code (school tables type of establishment code)
+      urn: rand(2_147_483_647),
+      urn_ac: is_open_academy ? rand(2_147_483_647) : nil,
+      open_ac: is_open_academy ? date_rand(from: Date.new(academic_year-10, rand(1..12), rand(1..20)).to_time): nil,
+      toe_code: [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 17, 18, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 52, 53, 56, 98].sample,
       nftype: nftype,
       mmsch: ((20..25).to_a + (50..52).to_a).include?(nftype) ? 1 : 0,
       mmsch2: (21..24).to_a.include?(nftype) ? 1 : 0,
       msch: (21..24).to_a.include?(nftype) ? 1 : 0,
       msch2: ((20..27).to_a + (50..53).to_a + [55]).include?(nftype) ? 1 : 0,
-      # amend
-      # amdpupil
+      amend: %i(A F R CL D IN J N NR TI TO TX Z).sample,
+      amdpupil: %i(A F R CL D IN J N NR TI TO TX Z).sample,
       sourcecty: ['E', 'W', 'O'].sample,
       langsch: ['E', 'W'].sample,
       langmatta: ['C', 'E', 'M'].sample,
       langscita: ['C', 'E', 'M'].sample,
       endks: rand(2),
       # enrolsts
-      # preleae
-      # nentries
-      # examyear_en
-      # examyear_re
-      # examyear_gps
-      # examyear_ma
-      # examyear_sc
+      preleae: rand(2010000..9389999),
+      nentries: rand(1..4),
+      examyear_en: academic_year,
+      examyear_re: academic_year,
+      examyear_gps: academic_year,
+      examyear_ma: academic_year,
+      examyear_sc: academic_year,
       schres: Random.new.rand(1.0) > 0.9 ? 0 : 1,
       lares: Random.new.rand(1.0) > 0.9 ? 0 : 1,
       natres: Random.new.rand(1.0) > 0.9 ? 0 : 1,
@@ -111,16 +114,16 @@ class App
       laresta: Random.new.rand(1.0) > 0.9 ? 0 : 1,
       natresta: Random.new.rand(1.0) > 0.9 ? 0 : 1,
       natmtdresta: Random.new.rand(1.0) > 0.9 ? 0 : 1,
-      # readoutcome
-      # matoutcome
-      # gpsoutcome
+      readoutcome: (%i(B T N 3 4 5 6 A L M Q S X Z F P) + [nil]).sample,
+      matoutcome: (%i(B T N 2 3 4 5 6 A L M Q S X Z F P) + [nil]).sample,
+      gpsoutcome: (%i(B T N 3 4 5 6 A L M Q S X Z F P) + [nil]).sample,
       readscore: rand(999),
       matscore: rand(999),
       gpsscore: rand(999),
-      # writtaoutcome
-      # scitaoutcome
-      # mattaoutcome
-      # readtaoutcome (see codesets)
+      writtaoutcome: %i(1 2 3 4 5 6A D L M F P Z).sample,
+      scitaoutcome: %i(1 2 3 4 5 6A D L M F P Z).sample,
+      mattaoutcome: %i(1 2 3 4 5 6A D L M F P Z).sample,
+      readtaoutcome: %i(1 2 3 4 5 6A D L M F P Z).sample,
       eligread: rand(2),
       eligreadta: rand(2),
       eligwrit: rand(2),
@@ -216,7 +219,7 @@ class App
       engmainlev: %i(2 3 4 5 A B D L M N Q X Z _X).sample,
       englev: ((2..5).to_a + %i(A B F IN L M N P Q S T X Y Z)).sample,
       englevta: ((1..6).to_a + %i(A D F IN L M P W Z)).sample,
-      # engextlev
+      engextlev: ((1..6).to_a + %i(A D F IN L M P W Z)).sample,
       engpoints: [0, 15, 21, 27, 33, 39, 45, 51].sample,
       engfine: format('%.1f', Random.new.rand(5.5) + 2.5),
       mattier: %i(35 A B F H IN L M P T Y Z).sample,
@@ -358,10 +361,10 @@ class App
       incva: rand(2),
       inks12va: rand(2),
       inmlwin: rand(2),
-      # cvapaps
-      # ks1aps
-      # cvaaps
-      # ks2apsfg
+      # cvapaps (KS1 average point score)
+      # ks1aps (KS1 average point score)
+      # cvaaps (KS2 average point score (fg))
+      # ks2apsfg (KS2 average point score (fg))
       cvapread: %i(A D L M W X 1 2C 2B).sample,
       # ks1readps
       cvapwrit: %i(A D L M W X 1 2C 2B).sample,
@@ -390,28 +393,28 @@ class App
       ks2readfg: format('%.2f', Random.new.rand(36.0) + 3),
       ks2matfg: format('%.2f', Random.new.rand(36.0) + 3),
       ks2writtafg: Random.new.rand(36.0) + 3,
-      # vaapsscore
-      # vaengscore
-      # vamatscore
-      # vaapspred1
-      # vaapspred
-      # vaengpred1
-      # vaengpred
-      # vaopred1
+      vaapsscore: rand(36) + 3,
+      vaengscore: rand(36) + 3,
+      vamatscore: rand(36) + 3,
+      vaapspred1: rand(36) + 3,
+      vaapspred: rand(36) + 3,
+      vaengpred1: rand(36) + 3,
+      vaengpred: rand(36) + 3,
+      vaopred1: rand(36) + 3,
       vaopred: rand(36) + 3,
-      # vaoscore
-      # vamatpred1
+      vaoscore: rand(36) + 3,
+      vamatpred1: rand(36) + 3,
       vamatpred: rand(36) + 3,
       # vareadpred1
       vareadpred: rand(36) + 3,
-      # vareadscore
-      # vawrittapred1
+      vareadscore: rand(36) + 3,
+      vawrittapred1: rand(36) + 3,
       vawrittapred: rand(36) + 3,
-      # vawrittascore
-      # papssq
-      # pe_dev
-      # pr_dev
-      # pm_dev
+      vawrittascore: rand(36) + 3,
+      papssq: rand(36) + 3,
+      pe_dev: rand(36) + 3,
+      pr_dev: rand(36) + 3,
+      pm_dev: rand(36) + 3,
       pseng: (%i(NOTSEN P1i P1ii p2i P2ii P3i P3ii) + [nil]).sample,
       psread: (%i(NOTSEN P4 P5 P5 P6 P7 P8) + [nil]).sample,
       pswrite: (%i(NOTSEN P4 P5 P5 P6 P7 P8) + [nil]).sample,
@@ -502,8 +505,8 @@ class App
       mob1: joined_school_years_ago == 0,
       mob2: joined_school_years_ago == 1,
       mob3: joined_school_years_ago >=2 && joined_school_years_ago <=3,
-      # lang
-      # lang1st
+      # lang (not in data tables)
+      # lang1st (not in data tables)
       senelk: rand(2),
       senele: rand(2),
       senelse: rand(2),
@@ -514,19 +517,19 @@ class App
       slt_app: rand(2),
       reftest: [0, 0, 0, 0, 0, 0, 9, 2, 1].sample,
       refta: [0, 0, 0, 0, 0, 0, 0, 9, 1].sample,
-      # contflag
+      # contflag (not in data tables)
       version: ['U', 'A', 'F'].sample,
-      # releaseflag
+      releaseflag: 0,
       readspeccon: [0,1,2].sample,
       matspeccon: [0,1,2].sample,
       gpsspeccon: [0,1,2].sample,
-      # readprogscore_p_adjusted
-      # writprogscore_p_adjusted
-      # matprogscore_p_adjusted
-      # ks2_psnumps
-      # ks2_psusingps
-      # ks2_psshapeps
-      # ks2_psmathsav
+      # readprogscore_p_adjusted (not in data tables)
+      # writprogscore_p_adjusted (not in data tables)
+      # matprogscore_p_adjusted (not in data tables)
+      # ks2_psnumps (not in data tables)
+      # ks2_psusingps (not in data tables)
+      # ks2_psshapeps (not in data tables)
+      # ks2_psmathsav (not in data tables)
       plaa: %i(N A G W C).sample,
       pcode: Faker::Address.postcode
     )
@@ -553,6 +556,6 @@ class App
   end
 end
 
-App.new.create_pupils(count: 100)
+App.new.create_pupils(count: 500)
 
 puts "There are now #{Ks2Pupil.count} records"
